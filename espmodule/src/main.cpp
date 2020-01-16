@@ -15,7 +15,7 @@
 #define FAVICON "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACHklEQVR4XoWT70tTURjHzz/in9CbueaYW2rlikCIftELdXOTpeJPlqNITV9LTWQzInMZc4Qvyk0NhYKoqDdtc7C1lFWv1FigsQiMxr6e5xzP9d6gPPDc59z7nOfz/DqXlctl0CJNUqlUxDtpZVN7ZXv3KYHO+1ZxjoknX5mvrzWQAirb23wc/TN29M7YhPQ/ssM9US0BKsq1e1ZhGI978H49oUWffnlDOF2POTD4/AxGl50YnG9Ayx2TEdB614RbT0/h5pM69EVqhVPy8wuhhxZOC+fhRCO6Z23oiFjgUgCVJhG7o7UYisvDgbk6+KN2DMZO4PaSEwM8g46HVvQ8dojo/ukmYw9agia4gtXoitjE4ZHFRpFuIOqAN3wcbZNmtE9ZhLNKX+sB9WHnZ5EbzKBSvGELPCEz+mbt8HGnZOEVfOF6eIJWrCTntAnRVLQmEu33nz2MxFwiwpvsEnoenIQvJMelmq3f0zcxxn8ZV3MxuEM1/weoC0SnCsPHsOFjyB3Ihpch08SQOsuwphP9xdIuEgFKqTgylxh23AzfW6XevszlAkOR63UOI5B+Gd+45aOHoTTAsNsr9berDJvnJSTNnYsLk0aAvgTaZylqlwTsEuDKISB1jqH8q2T4TwxTIMCXcScK7dJZAbZ5BlTCGgf83XQDgIw/PjxDrk2mr0oo8vS3LvJmHgVQ5VAZeT4BkvTBFGgS2eYqkYH+V98HQY0eaNw1dPsAAABRdEVYdENvbW1lbnQAQ29weXJpZ2h0IElOQ09SUyBHbWJIICh3d3cuaWNvbmV4cGVyaWVuY2UuY29tKSAtIFVubGljZW5zZWQgcHJldmlldyBpbWFnZbaaaaYAAAA4dEVYdENvcHlyaWdodABDb3B5cmlnaHQgSU5DT1JTIEdtYkggKHd3dy5pY29uZXhwZXJpZW5jZS5jb20pTs6ZTgAAAFp6VFh0Q29tbWVudAAAeJxzzi+oLMpMzyhR8PRz9g8KVnDPTfJQ0CgvL9fLTM7PS60oSC3KTM1LTtVLzs/VVNBVCM3LyUxOzStOTVEoKEoty0wtV8jMTUxPBQC4jxoknLyY4wAAAEF6VFh0Q29weXJpZ2h0AAB4nHPOL6gsykzPKFHw9HD4DwpWcM9N8lDQKC8v18tMzs9LrShILcpMzUtO1UvOz9UEAH02EGgc3eaPAAAAAElFTkSuQmCC"
 
 #define period 1000*10
-#define DEBUG false //if true will ignore if already watered
+#define DEBUG true //if true will ignore if already watered
 
 #define D0 16 
 #define D1 5
@@ -121,7 +121,7 @@ void setup() {
   WiFiManager wifiManager;
   //wifiManager.resetSettings();    //Uncomment this to wipe WiFi settings from EEPROM on boot.  Comment out and recompile/upload after 1 boot cycle.
   wifiManager.setAPStaticIPConfig(IPAddress(192,168,1,94), IPAddress(192,168,1,94), IPAddress(255,255,255,0));
-  wifiManager.autoConnect("SmartGarden-ESP8266", "smartgarden");
+  wifiManager.autoConnect("Erobotica", "pi-e=0.42");
   //if you get here you have connected to the WiFi
   Serial.println("Connected");
 
@@ -141,16 +141,6 @@ void setup() {
 
   setTimeFromNTP(0);
 
-  //check if password is set and written on EEPROM
-  readIsPasswordSetFromEeprom(isPasswordSet);
-  if (DEBUG) Serial.println("isPasswordSet: " + String(isPasswordSet));
-  if(isPasswordSet != 1){
-    resetPassword();
-  }
-  readIsPasswordSetFromEeprom(isPasswordSet);
-  if (DEBUG) Serial.println("isPassword RESET: " + String(isPasswordSet));
-  
-
   if(isPasswordSet){
     readPasswordFromEeprom();
       if (DEBUG) {
@@ -158,7 +148,7 @@ void setup() {
         Serial.println(pwd);
       }
   }
-  // Server configuration 
+  // Server configuration (Put here configuration for AWS IoT)
   
   server.on("/conf", [](){
     // saves user data to the eeprom
