@@ -11,12 +11,14 @@
 #include <stdio.h>
 #include <string.h>
 
+// Replace with AWS
 #define INDEX_HTML "<!DOCTYPE html><html><head><title>SmartGarden-ESP8266 Configuration</title><link rel='shortcut icon' href='{favicon}' /><style>body { font-family: Helvetica, Arial, sans-serif; font-size: 16px ;padding: 10px }</style></head><body><h1>SmartGarden-ESP8266 Configuration</h1><div  style=' float:left;'><form method='GET' action='/conf' target='output_frame'><label><strong>Light start hour: </strong></label><br /><input type='number' min='0' max='23' step='1' pattern='([01]?[0-9]{1}|2[0-3]{1})' name='startTime' value='{startTime}' maxlength='2' size='1' style='font-size: 16px;' /><br /><br /><label><strong>Light end hour: </strong></label><br /><input type='number' min='0' max='23' step='1' pattern='([01]?[0-9]{1}|2[0-3]{1})' name='endTime' value='{endTime}' maxlength='2' size='1' style='font-size: 16px;' /><br /><br /><label><strong>Watering hour: </strong></label><br /><input type='number' min='0' max='23' step='1' pattern='([01]?[0-9]{1}|2[0-3]{1})' name='waterTime' value='{waterTime}' maxlength='2' size='1' style='font-size: 16px;' /><br /><br /><strong>Password: </strong></label><br /><input type='password' maxlength='32' name='pwd' value='{pwd}' size='32' style='font-size: 16px;' /><br /><br /><input type='submit' value='Submit'></form></div><div style=' float:left; margin-left: 160px;'><h3>Status</h3><p><Strong>Pot 1:</Strong> {pot1}</p><p><Strong>Pot 2:</Strong> {pot2}</p><p><Strong>Water tank:</Strong> {tank}</p><p><Strong>Already watered today:</Strong> {waterToday}</p></div><br /><br /><div style='clear:both'></div><h3>Set a password </h3><p>Please set a password of max 32 characters. </p><form method='GET' action='/newpwd' target='output_frame'><label><strong>New Password: </strong></label><br /><input type='password' maxlength='32' name='newPwd' value='{newPwd}' size='32' style='font-size: 16px;' /><br /><br /><input type='submit' value='Submit'></form><br /><br /><iframe id='output_frame' name='output_frame' allowtransparency='true' width='350' height='80' frameBorder='0'>Browser not compatible</iframe></body></html>"
 #define FAVICON "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACHklEQVR4XoWT70tTURjHzz/in9CbueaYW2rlikCIftELdXOTpeJPlqNITV9LTWQzInMZc4Qvyk0NhYKoqDdtc7C1lFWv1FigsQiMxr6e5xzP9d6gPPDc59z7nOfz/DqXlctl0CJNUqlUxDtpZVN7ZXv3KYHO+1ZxjoknX5mvrzWQAirb23wc/TN29M7YhPQ/ssM9US0BKsq1e1ZhGI978H49oUWffnlDOF2POTD4/AxGl50YnG9Ayx2TEdB614RbT0/h5pM69EVqhVPy8wuhhxZOC+fhRCO6Z23oiFjgUgCVJhG7o7UYisvDgbk6+KN2DMZO4PaSEwM8g46HVvQ8dojo/ukmYw9agia4gtXoitjE4ZHFRpFuIOqAN3wcbZNmtE9ZhLNKX+sB9WHnZ5EbzKBSvGELPCEz+mbt8HGnZOEVfOF6eIJWrCTntAnRVLQmEu33nz2MxFwiwpvsEnoenIQvJMelmq3f0zcxxn8ZV3MxuEM1/weoC0SnCsPHsOFjyB3Ihpch08SQOsuwphP9xdIuEgFKqTgylxh23AzfW6XevszlAkOR63UOI5B+Gd+45aOHoTTAsNsr9berDJvnJSTNnYsLk0aAvgTaZylqlwTsEuDKISB1jqH8q2T4TwxTIMCXcScK7dJZAbZ5BlTCGgf83XQDgIw/PjxDrk2mr0oo8vS3LvJmHgVQ5VAZeT4BkvTBFGgS2eYqkYH+V98HQY0eaNw1dPsAAABRdEVYdENvbW1lbnQAQ29weXJpZ2h0IElOQ09SUyBHbWJIICh3d3cuaWNvbmV4cGVyaWVuY2UuY29tKSAtIFVubGljZW5zZWQgcHJldmlldyBpbWFnZbaaaaYAAAA4dEVYdENvcHlyaWdodABDb3B5cmlnaHQgSU5DT1JTIEdtYkggKHd3dy5pY29uZXhwZXJpZW5jZS5jb20pTs6ZTgAAAFp6VFh0Q29tbWVudAAAeJxzzi+oLMpMzyhR8PRz9g8KVnDPTfJQ0CgvL9fLTM7PS60oSC3KTM1LTtVLzs/VVNBVCM3LyUxOzStOTVEoKEoty0wtV8jMTUxPBQC4jxoknLyY4wAAAEF6VFh0Q29weXJpZ2h0AAB4nHPOL6gsykzPKFHw9HD4DwpWcM9N8lDQKC8v18tMzs9LrShILcpMzUtO1UvOz9UEAH02EGgc3eaPAAAAAElFTkSuQmCC"
 
 #define period 1000*10
-#define DEBUG true //if true will ignore if already watered
+#define DEBUG false //if true will ignore if already watered
 
+// Pinos utilizados
 #define D0 16 
 #define D1 5
 #define D2 4
@@ -48,32 +50,14 @@ char pwd[33];
 char server_pwd[33];
 char new_pwd[33];
 
-//TODO set from server web
-int GMT = 2; 
-
 int status = WL_IDLE_STATUS;     // the Wifi radio's status
 
-// Domoticz
+// Domoticz (Search where is used)
 int idx = 2;
-char* ipPort = "192.168.1.93:8080";
+char* ipPort = "192.168.1.93:8080"; // Replace with AWS
 
-// NTP
-unsigned int localPort = 2390;      // local port to listen for UDP packets
-/* Don't hardwire the IP address or we won't get the benefits of the pool.
- *  Lookup the IP address for the host name instead */
-//IPAddress timeServer(129, 6, 15, 28); // time.nist.gov NTP server
-IPAddress timeServerIP; // time.nist.gov NTP server address
-const char* ntpServerName = "time.nist.gov";
-const int NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
-byte packetBuffer[ NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing packets
-// A UDP instance to let us send and receive packets over UDP
-WiFiUDP udp;
-
-
-unsigned long sendNTPpacket(IPAddress& address);
 void setTimeFromNTP(const int update);
 void updateTimeFromInternalClock(const int seconds);
-void sendDataToServer();
 void timerCallback(void *pArg);
 void readDataFromEeprom(int& startTime, int& endTime, int& waterTime);
 void readIsPasswordSetFromEeprom(int& isPasswordSet);
@@ -83,7 +67,7 @@ void writeIsPasswordSetOnEeprom();
 void resetPasswordFromButton();
 
 //starts http server on port 8080
-ESP8266WebServer server(8080);
+ESP8266WebServer server(8080); // Replace with AWS
 
 int getHour(long epoch);
 bool inRange(int currentHour, int startTime, int endTime);
@@ -150,103 +134,13 @@ void setup() {
   }
   // Server configuration (Put here configuration for AWS IoT)
   
-  server.on("/conf", [](){
-    // saves user data to the eeprom
-    // TODO verify user input
-    strncpy(server_pwd, server.arg("pwd").c_str(), 33);  
-    if (DEBUG) {
-        Serial.println("Password from server: ");
-        Serial.println(server_pwd);
-      }
-    if ((isPasswordSet && strcmp(server_pwd, pwd) == 0) || !isPasswordSet) {
-      if (DEBUG) {
-        Serial.print("Password is set: ");
-        Serial.print(isPasswordSet);
-        Serial.println(" and it is correct.");
-      }
-      
-      startTime = server.arg("startTime").toInt();
-      endTime = server.arg("endTime").toInt();
-      waterTime = server.arg("waterTime").toInt();    
-      
-      EEPROM.begin(512);
-      EEPROM.put(0, startTime);
-      EEPROM.put(sizeof(startTime), endTime);
-      EEPROM.put(sizeof(startTime) + sizeof(endTime), waterTime);
-      EEPROM.commit();
-      EEPROM.end();
   
-      eepromReadRequired = true;
-      
-      server.send(200, "text/plain", "Saved: " + String(startTime) + " " + String(endTime) + " " + String(waterTime));
-    }
-    else {
-      if (DEBUG) {
-        Serial.print("Password is set: ");
-        Serial.print(isPasswordSet);
-        Serial.println(" but it is not correct.");
-      }
-      server.send(200, "text/plain", "Wrong Password.");
-    }
-  });
-
-  server.on("/newpwd", [](){
-    // saves user set password to the eeprom
-    if (!isPasswordSet) {
-      
-      strncpy(new_pwd, server.arg("newPwd").c_str(), 33);  
-      if (DEBUG) {
-          Serial.println("New password from server: ");
-          Serial.println(new_pwd);
-        }   
-        
-      EEPROM.begin(512);
-      EEPROM.put(sizeof(startTime) + sizeof(endTime) + sizeof(waterTime) + sizeof(day) + sizeof(isPasswordSet), new_pwd);
-      EEPROM.commit();
-      EEPROM.end();
-      
-      writeIsPasswordSetOnEeprom();
-    
-      readIsPasswordSetFromEeprom(isPasswordSet);
-      if (DEBUG) Serial.println("isPasswordSet: " + String(isPasswordSet));
-      
-      readPasswordFromEeprom();
-      if (DEBUG) {
-        Serial.println("Password from eeprom: ");
-        Serial.println(pwd);
-      }
-      server.send(200, "text/plain", "Password Saved.");
-    }
-    else {
-      server.send(200, "text/plain", "Password Already Set, press the balck button on Smart Garden to reset.");
-    }
-        
-  });
-
-  server.on("/", [](){
-    String html_home_page = INDEX_HTML;
-
-    readDataFromEeprom(startTime, endTime, waterTime);
-
-    html_home_page.replace("{favicon}", FAVICON);
-    html_home_page.replace("{startTime}", String(startTime));
-    html_home_page.replace("{endTime}", String(endTime));
-    html_home_page.replace("{waterTime}", String(waterTime));
-
-    digitalRead(D3)? html_home_page.replace("{pot1}", "dry") : html_home_page.replace("{pot1}", "moist");
-    digitalRead(D4)? html_home_page.replace("{pot2}", "dry") : html_home_page.replace("{pot2}", "moist");
-    digitalRead(D0)? html_home_page.replace("{tank}", "empty") : html_home_page.replace("{tank}", "full");
-    waterToday(getDay(localTime), day)? html_home_page.replace("{waterToday}", "no") : html_home_page.replace("{waterToday}", "yes");
-
-    server.send(200, "text/html", html_home_page);
-  });
-
-  server.begin();
 }
 
 void loop() {  
   if (DEBUG)   delay(5000);
-  server.handleClient();
+  
+  // Handle Client of Server Here
   
   if(timeSyncCounter >= TIME_SYNC_SECONDS) {
     setTimeFromNTP(1);
@@ -369,52 +263,6 @@ void setTimeFromNTP(const int update) {
 void updateTimeFromInternalClock(const int seconds) {
   localTime += seconds;
   //if (DEBUG) Serial.println(localTime);
-}
-
-unsigned long sendNTPpacket(IPAddress& address){
-  if (DEBUG) Serial.println("sending NTP packet...");
-  // set all bytes in the buffer to 0
-  memset(packetBuffer, 0, NTP_PACKET_SIZE);
-  // Initialize values needed to form NTP request
-  // (see URL above for details on the packets)
-  packetBuffer[0] = 0b11100011;   // LI, Version, Mode
-  packetBuffer[1] = 0;     // Stratum, or type of clock
-  packetBuffer[2] = 6;     // Polling Interval
-  packetBuffer[3] = 0xEC;  // Peer Clock Precision
-  // 8 bytes of zero for Root Delay & Root Dispersion
-  packetBuffer[12]  = 49;
-  packetBuffer[13]  = 0x4E;
-  packetBuffer[14]  = 49;
-  packetBuffer[15]  = 52;
-
-  // all NTP fields have been given values, now
-  // you can send a packet requesting a timestamp:
-  udp.beginPacket(address, 123); //NTP requests are to port 123
-  udp.write(packetBuffer, NTP_PACKET_SIZE);
-  udp.endPacket();
-}
-
-void sendDataToServer(){
-  int data = (1000 - analogRead(17))/7.5;
-  if (DEBUG) {
-    Serial.print("Sending data to server: ");
-    Serial.print(data);
-    Serial.println();
-  }
-  HTTPClient http;
-  char msg[95];
-  snprintf(msg, 95, "http://%s/json.htm?type=command&param=udevice&idx=%d&nvalue=%d&svalue=%d", ipPort, idx, data, data);
-  if (DEBUG) Serial.println(msg);
-  http.begin(msg);
-
-  int httpCode = http.GET();
-  if (DEBUG) {
-    Serial.print("http code: ");
-    Serial.print(httpCode);
-    Serial.println();
-  }
-
-   http.end();
 }
 
 void timerCallback(void *pArg) {
